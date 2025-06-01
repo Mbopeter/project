@@ -33,7 +33,7 @@ pipeline {
             steps {
                 echo 'Deploying to Tomcat...'
                 script {
-                    def warFile = "target/*.war"
+                    def warFile = "target/brightmind-tech.war"
                     if (fileExists(warFile)) {
                         deploy adapters: [
                             tomcat9(
