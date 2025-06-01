@@ -1,65 +1,56 @@
-pipeline {
+ pipeline {
     agent any
+    
     tools {
         jdk 'JDK-21'
         maven 'Maven-3.9.9'
     }
+    
     stages {
-        stage('Checkout Source') {
-    steps {
-        echo 'Checking out source code...'
-        git branch: 'main', url: 'https://github.com/erictita/brightmind-tech.git'
-    }
-}
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        
         stage('Build') {
             steps {
-                echo 'Compiling the application...'
-                bat 'mvn clean compile'
+                sh 'mvn clean compile'
             }
         }
+        
         stage('Test') {
             steps {
-                echo 'Running tests...'
-                bat 'mvn test'
+                sh 'mvn test'
             }
         }
+        
         stage('Package') {
             steps {
-                echo 'Packaging the application...'
-                bat 'mvn package'
+                sh 'mvn package'
             }
         }
-        stage('Deploy to Tomcat') {
+        
+        stage('Deploy') {
             steps {
-                echo 'Deploying to Tomcat...'
-                script {
-                    def warFile = "target/*.war"
-                    if (fileExists(warFile)) {
-                        deploy adapters: [
-                            tomcat9(
-                                credentialsId: 'TomcatCreds',
-                                url: 'http://localhost:8084'
-                            )
-                        ],
-                        contextPath: '/Brightmind-tech',
-                        war: warFile
-                    } else {
-                        error "ERROR: WAR file ${warFile} not found!"
-                    }
-                }
+                deploy adapters: [tomcat9(credentialsId: 'tomcatcreds', 
+                                         path: '', 
+                                         url: 'http://localhost:8084/')], 
+                       contextPath: '/Brightmind-tech', 
+                       war: 'target/*.war'
             }
         }
     }
+    
     post {
         always {
-            echo 'Cleaning up workspace...'
-            deleteDir()
+            cleanWs()
         }
         success {
-            echo 'Pipeline completed successfully!'
+            echo 'Pipeline succeeded!'
         }
         failure {
-            echo 'Pipeline failed. Check build logs for details.'
+            echo 'Pipeline failed!'
         }
     }
-}
+ }
