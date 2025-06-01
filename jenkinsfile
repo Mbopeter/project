@@ -33,7 +33,7 @@ pipeline {
             steps {
                 echo 'Deploying to Tomcat...'
                 script {
-                    def warFile = "target/brightmind-tech.war"
+                    def warFile = "target/Brightmind-tech.war"
                     if (fileExists(warFile)) {
                         deploy adapters: [
                             tomcat9(
@@ -41,7 +41,7 @@ pipeline {
                                 url: 'http://localhost:8084'
                             )
                         ],
-                        contextPath: '/brightmind-tech',
+                        contextPath: '/Brightmind-tech',
                         war: warFile
                     } else {
                         error "ERROR: WAR file ${warFile} not found!"
